@@ -1,148 +1,88 @@
-#import all necessary modules
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
+from matplotlib.lines import Line2D
 
-#------------------------------#
-#-----2mm----------------------#
-#------------------------------#
-
-# Charge transfer steps
-charge_steps = np.arange(1, 10)
-
-# Voltage measurements for 2mm plate separation
+# Process 2mm Plate Separation Data
+charge_steps_2mm = np.arange(1, 10)  # Steps 1–9
 voltage_2mm = np.array([
-    [12, 10, 11],
-    [20, 20, 25],
-    [28, 25, 35],
-    [39, 35, 48],
-    [48, 45, 59],
-    [57, 62, 65],
-    [69, 71, 75],
-    [75, 82, 83],
-    [94, np.nan, np.nan]
+    [0.5, 1, 1.5],
+    [2, 2.3, 2],
+    [3, 4, 3],
+    [4.4, 4.5, 4],
+    [5.2, 5, 5.2],
+    [6, 6, 6.5],
+    [7.2, 7, 7.5],
+    [8.2, 8.3, 8.4],
+    [9.5, 9, 9.5]
 ])
 
-# mean voltage and standard deviation (ignoring NaN values)
 avg_voltage_2mm = np.nanmean(voltage_2mm, axis=1)
 std_voltage_2mm = np.nanstd(voltage_2mm, axis=1)
 
-#charge_steps to match the length of avg_voltage_2mm
-charge_steps_trimmed = charge_steps[:len(avg_voltage_2mm)]
+slope_2mm, intercept_2mm, r_value_2mm, _, _ = linregress(charge_steps_2mm, avg_voltage_2mm)
+fit_2mm = slope_2mm * charge_steps_2mm + intercept_2mm
+formula_2mm = rf"2mm: $V = {slope_2mm:.2f}Q + {intercept_2mm:.2f}$"
 
-# Linear regression for best-fit line
-slope_2mm, intercept_2mm, r_value, _, _ = linregress(charge_steps_trimmed, avg_voltage_2mm)
-print(f"2mm Plate Separation:")
-print(f"  Slope = {slope_2mm:.2f} V per step")
-print(f"  y-intercept = {intercept_2mm:.2f} V")
-print(f"  R-squared = {r_value**2:.3f}")
-
-# best-fit line
-fit_2mm = slope_2mm * charge_steps_trimmed + intercept_2mm
-
-#error bars
-plt.figure(figsize=(8, 6))
-plt.errorbar(charge_steps_trimmed, avg_voltage_2mm, yerr=std_voltage_2mm,
-             fmt='o', label='2mm Plate Separation', color='darkslategrey', capsize=5)
-plt.plot(charge_steps_trimmed, fit_2mm, linestyle='--', color='darkslategrey', label='Best Fit Line')
-
-#formula
-formula = rf"$V = {slope_2mm:.2f}Q + {intercept_2mm:.2f}$"
-plt.text(2, max(avg_voltage_2mm) - 15, formula, fontsize=12, color="darkslategrey")  # Adjusted y-position
-
-plt.xlabel("Charge Transfer Steps")
-plt.ylabel("Voltage (V)")
-plt.title("Voltage vs. Charge Transfer Steps (2mm Separation)")
-plt.legend()
-plt.grid()
-plt.show()
-
-# Charge transfer steps (trimmed to match valid data)
-charge_steps = np.arange(1, 6)  # Steps 1–5 (since steps 6–9 are NaN)
-
-# Voltage measurements for 4mm plate separation (trimmed to exclude NaN rows)
+# Process 4mm Plate Separation Data
+charge_steps_4mm = np.arange(1, 12)  # Steps 1–11
 voltage_4mm = np.array([
-    [23, 25, 25],
-    [42, 41, 45],
-    [60, 58, 55],
-    [72, 75, 66],
-    [84, 89, 85]
+    [2.7, 1.8, 2.7],
+    [4.5, 4.2, 4.5],
+    [6.3, 6.0, 6.0],
+    [9.0, 7.5, 7.5],
+    [10.5, 9.0, 9.6],
+    [12.0, 10.5, 11.4],
+    [13.5, 12.0, 12.6],
+    [15.0, 13.2, 14.7],
+    [16.5, 13.8, 15.9],
+    [17.4, 15.9, 17.4],
+    [18.0, 17.7, 18.9]
 ])
 
-#------------------------------#
-#-----4mm----------------------#
-#------------------------------#
-
-
-#mean voltage and standard deviation
 avg_voltage_4mm = np.nanmean(voltage_4mm, axis=1)
 std_voltage_4mm = np.nanstd(voltage_4mm, axis=1)
 
-# Linear regression for best-fit line
-slope_4mm, intercept_4mm, r_value, _, _ = linregress(charge_steps, avg_voltage_4mm)
-print("4mm Plate Separation:")
-print(f"  Slope = {slope_4mm:.2f} V per step")
-print(f"  y-intercept = {intercept_4mm:.2f} V")
-print(f"  R-squared = {r_value**2:.3f}")
+slope_4mm, intercept_4mm, r_value_4mm, _, _ = linregress(charge_steps_4mm, avg_voltage_4mm)
+fit_4mm = slope_4mm * charge_steps_4mm + intercept_4mm
+formula_4mm = rf"4mm: $V = {slope_4mm:.2f}Q + {intercept_4mm:.2f}$"
 
-# best-fit line
-fit_4mm = slope_4mm * charge_steps + intercept_4mm
+# Create Combined Plot
+plt.figure(figsize=(10, 6))
 
-#error bars
-plt.figure(figsize=(8, 6))
-plt.errorbar(charge_steps, avg_voltage_4mm, yerr=std_voltage_4mm,
-             fmt='o', label='4mm Plate Separation', color='salmon', capsize=5)
-plt.plot(charge_steps, fit_4mm, linestyle='--', color='salmon', label='Best Fit Line')
-formula = rf"$V = {slope_4mm:.2f}Q + {intercept_4mm:.2f}$"
-plt.text(1.5, max(avg_voltage_4mm) - 15, formula, fontsize=12, color="salmon")  # Adjust position as needed
+# Plot 2mm data with error bars and best-fit line
+plt.errorbar(charge_steps_2mm, avg_voltage_2mm, yerr=std_voltage_2mm, 
+             fmt='o', color='blue', capsize=5, label='_nolegend_')
+plt.plot(charge_steps_2mm, fit_2mm, '--', color='blue', label='_nolegend_')
 
+# Plot 4mm data with error bars and best-fit line
+plt.errorbar(charge_steps_4mm, avg_voltage_4mm, yerr=std_voltage_4mm, 
+             fmt='o', color='red', capsize=5, label='_nolegend_')
+plt.plot(charge_steps_4mm, fit_4mm, '--', color='red', label='_nolegend_')
+
+# Add regression formulas
+plt.text(0.05, 0.95, formula_2mm, transform=plt.gca().transAxes, 
+         color='blue', fontsize=12, va='top')
+plt.text(0.05, 0.88, formula_4mm, transform=plt.gca().transAxes, 
+         color='red', fontsize=12, va='top')
+
+# Custom legend with combined markers and lines
+legend_elements = [
+    Line2D([0], [0], color='blue', marker='o', linestyle='--', label='2mm Data and Fit'),
+    Line2D([0], [0], color='red', marker='o', linestyle='--', label='4mm Data and Fit')
+]
+plt.legend(handles=legend_elements, loc='lower right')
+
+# Labels and title
 plt.xlabel("Charge Transfer Steps")
 plt.ylabel("Voltage (V)")
-plt.title("Voltage vs. Charge Transfer Steps (4mm Separation)")
-plt.legend()
-plt.grid()
+plt.title("Voltage vs. Charge Transfer Steps for 2mm and 4mm Plate Separations")
+plt.grid(True)
+
 plt.show()
 
-#------------------------------#
-#-----combined-----------------#
-#------------------------------#
-
-# Best-fit lines
-fit_2mm = slope_2mm * charge_steps_trimmed + intercept_2mm
-fit_4mm = slope_4mm * charge_steps + intercept_4mm
-
-# Create a single figure
-plt.figure(figsize=(8, 6))
-plt.rc('text', usetex=False)
-plt.rc('font', family='serif')
-
-# Plot 2mm separation data
-plt.errorbar(charge_steps_trimmed, avg_voltage_2mm, yerr=std_voltage_2mm,
-             fmt='o', label='2mm Plate Separation', color='darkslategrey', capsize=5)
-plt.plot(charge_steps_trimmed, fit_2mm, linestyle='--', color='darkslategrey', label='Best Fit Line (2mm)')
-
-# Plot 4mm separation data
-plt.errorbar(charge_steps, avg_voltage_4mm, yerr=std_voltage_4mm,
-             fmt='o', label='4mm Plate Separation', color='salmon', capsize=5)
-plt.plot(charge_steps, fit_4mm, linestyle='--', color='salmon', label='Best Fit Line (4mm)')
-
-# Add formulas
-formula_2mm = rf"$V = {slope_2mm:.2f}Q + {intercept_2mm:.2f}$"
-formula_4mm = rf"$V = {slope_4mm:.2f}Q + {intercept_4mm:.2f}$"
-
-# Position text annotations dynamically
-plt.annotate(formula_2mm, xy=(min(charge_steps_trimmed), max(avg_voltage_2mm) * 0.9),
-             fontsize=12, color="darkslategrey")
-plt.annotate(formula_4mm, xy=(min(charge_steps), max(avg_voltage_4mm) * 0.8),
-             fontsize=12, color="salmon")
-
-# Labels and formatting
-plt.xlabel(r"Charge Transfer Steps ($Q$)")
-plt.ylabel(r"Voltage ($V$)")
-plt.title("Voltage vs. Charge Transfer Steps for Different Plate Separations")
-plt.legend()
-plt.grid()
-
-# Show the plot
-plt.show()
-
+# Output regression results
+print("2mm Plate Separation Results:")
+print(f"  Slope: {slope_2mm:.2f} V/step, Intercept: {intercept_2mm:.2f} V, R²: {r_value_2mm**2:.3f}")
+print("\n4mm Plate Separation Results:")
+print(f"  Slope: {slope_4mm:.2f} V/step, Intercept: {intercept_4mm:.2f} V, R²: {r_value_4mm**2:.3f}")
